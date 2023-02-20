@@ -130,6 +130,11 @@ dmypy.json
 # User defined
 assgn2_venv
 
+# airflow
+airflow/logs
+airflow/plugins
+airflow/working_data
+
 # great_expectations
 great_expectations/checkpoints
 great_expectations/data
