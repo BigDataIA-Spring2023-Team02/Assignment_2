@@ -124,14 +124,55 @@ class NexradMapSqlite:
         data = self.fetch_from_sql_into_df()
         return data
 
+class UserSqlite:
+    def __init__(self):
+
+        database_file_name = 'scrape_data.db'
+        self.database_file_path = os.path.join(os.path.dirname(__file__), database_file_name)
+        ddl_file_name = 'users.sql'
+        self.ddl_file_path = os.path.join(os.path.dirname(__file__), ddl_file_name)
+        
+        scrape_metadata = Scrape_Data()
+        self.df = scrape_metadata.geos18_data()
+        self.table_name = 'Users'
+    
+    def create_database(self):
+        with open(self.ddl_file_path, 'r') as sql_file:
+            sql_script = sql_file.read()        
+        db = sqlite3.connect(self.database_file_path)
+        self.df.to_sql(self.table_name, db, if_exists = 'replace', index=False)
+        cursor = db.cursor()
+        cursor.executescript(sql_script)
+        db.commit()
+        db.close()
+
+    def check_database_initilization(self):
+        print(os.path.dirname(__file__))
+        if Path(self.database_file_path).is_file():
+            self.create_database()
+        else:
+            raise SystemExit
+
+    def fetch_from_sql_into_df(self):
+        db = sqlite3.connect(self.database_file_path)
+        df1 = pd.read_sql_query("SELECT * FROM Users", db)
+        return df1
+
+    def main(self):
+        self.check_database_initilization()
+        data = self.fetch_from_sql_into_df()
+        return data
+
 def main():
     geos_sql = GoesSqlite()
     nexrad_sql = NexradSqlite()
     nexradmap_sql = NexradMapSqlite()
+    user_sql = UserSqlite()
 
     geos_sql.main()
     nexrad_sql.main()
     nexradmap_sql.main()
+    user_sql.main()
 
 if __name__ == "__main__":
     main()

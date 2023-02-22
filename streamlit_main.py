@@ -113,9 +113,9 @@ def nexrad_search_field(satellite_input):
                 day = np.insert(day, 0, "")
                 day_input = st.selectbox('Select Day', day)
                 if day_input:
-                    station_code = nexrad_data[nexrad_data['Day'] == day_input]['NexRad Station Code'].unique()
+                    station_code = nexrad_data[nexrad_data['Day'] == day_input]['NexRad_Station_Code'].unique()
                     station_code = np.insert(station_code, 0, "")
-                    station_code_input = st.selectbox('NexRad Station Code', station_code)
+                    station_code_input = st.selectbox('NexRad_Station_Code', station_code)
                     if station_code_input:
                         with st.spinner('Wait for it...'):
                             files_list = aws_main.list_files_in_noaa_nexrad_bucket(year_input, month_input, day_input, station_code_input)
