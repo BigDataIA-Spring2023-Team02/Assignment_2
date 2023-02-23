@@ -86,49 +86,65 @@ def query_geos18(ID:int = None, Product_Name: str = None, Year: int = None, Day:
 
 
 def query_nexrad(ID: int = None, Year: int = None, Month: int = None, Day: int = None, NexRad_Station_Code: str = None):
-   # Build the SQL query based on the supplied query parameters
-   query = select([nexrad])
-  
-   if ID:
-       query = query.where(nexrad.columns.ID == ID)
-   if Year:
-       query = query.where(nexrad.columns.Year == Year)
-       if Month:
-           query = query.where(nexrad.columns.Month == Month)
-           if Day:
+    # Build the SQL query based on the supplied query parameters
+    query = select([nexrad])
+
+    if ID:
+       query = query.where(nexrad.columns.ID==ID)
+       if Year:
+           query = query.where(nexrad.columns.Year == Year)
+           if Month:
+               query = query.where(nexrad.columns.Month == Month)
+               if Day:
+                   query = query.where(nexrad.columns.Day == Day)
+                   if NexRad_Station_Code:
+                       query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
+           elif Day:
                query = query.where(nexrad.columns.Day == Day)
                if NexRad_Station_Code:
                    query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
-   elif Month:
-       query = query.where(nexrad.columns.Month == Month)
-       if Day:
-           query = query.where(nexrad.columns.Day == Day)
-           if NexRad_Station_Code:
+           elif NexRad_Station_Code:
                query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
-   elif Day:
-       query = query.where(nexrad.columns.Day == Day)
-       if NexRad_Station_Code:
-           query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
-   elif NexRad_Station_Code:
-       query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
 
 
-   # Execute the query and fetch the results
-   results = query.execute().fetchall()
+    # if ID:
+    #     query = query.where(nexrad.columns.ID == ID)
+    #     if Year:
+    #         query = query.where(nexrad.columns.Year == Year)
+    #         if Month:
+    #             query = query.where(nexrad.columns.Month == Month)
+    #             if Day:
+    #                 query = query.where(nexrad.columns.Day == Day)
+    #                 if NexRad_Station_Code:
+    #                     query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
+    #         elif Month:
+    #             query = query.where(nexrad.columns.Month == Month)
+    #             if Day:
+    #                 query = query.where(nexrad.columns.Day == Day)
+    #                 if NexRad_Station_Code:
+    #                     query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
+    #         elif Day:
+    #             query = query.where(nexrad.columns.Day == Day)
+    #             if NexRad_Station_Code:
+    #                 query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
+    #         elif NexRad_Station_Code:
+    #             query = query.where(nexrad.columns.NexRad_Station_Code == NexRad_Station_Code)
 
+    # Execute the query and fetch the results
+    results = query.execute().fetchall()
 
-   # Convert the results to a list of dictionaries
-   nexrad_data = []
-   for row in results:
-       nexrad_data.append({
-           'Year': row.Year,
-           'Month': row.Month,
-           'Day': row.Day,
-           'NexRad_Station_Code': row.NexRad_Station_Code
-       })
-   print(nexrad.columns)
-  
-   return nexrad_data
+    # Convert the results to a list of dictionaries
+    nexrad_data = []
+    for row in results:
+        nexrad_data.append({
+            'Year': row.Year,
+            'Month': row.Month,
+            'Day': row.Day,
+            'NexRad_Station_Code': row.NexRad_Station_Code
+        })
+    print(nexrad.columns)
+
+    return nexrad_data
 
 
 
