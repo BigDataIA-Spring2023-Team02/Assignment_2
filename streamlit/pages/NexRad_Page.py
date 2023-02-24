@@ -20,7 +20,7 @@ with st.sidebar:
 if st.session_state['logged_in'] == True:
     st.markdown("<h2 style='text-align: center;'>Data Exploration of the GEOS dataset 🌎</h1>", unsafe_allow_html=True)
     st.header("")
-    st.image(Image.open('/Users/meetdoshi/Documents/Northeastern University/SPRING 2023/Big Data Systems & Intelligent Analytics/Assignment_2/Images/SatelliteImage.jpeg'))
+    st.image(Image.open('streamlit/pages/SatelliteImage.jpeg'))
     
     BASE_URL = "http://localhost:8000"
     option = st.selectbox('Select the option to search file', ('Select Search Type', 'Search By Field 🔎', 'Search By Filename 🔎'))
