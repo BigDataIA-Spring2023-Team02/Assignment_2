@@ -40,7 +40,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
     elif option == 'Search By Field 🔎':
         with st.spinner('Wait for it...'):
             st.markdown("<h3 style='text-align: center;'>Search Through Fields 🔎</h1>", unsafe_allow_html=True)
-            response = requests.request("GET", f"{BASE_URL}/database/nexrad")
+            response = requests.get(f"{BASE_URL}/noaa-database/nexrad")
             if response.status_code == 200:
                 json_data = json.loads(response.text)
                 years = json_data
@@ -53,7 +53,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                 st.warning("Please select a year!")
             else:
                 with st.spinner("Loading..."):
-                    response = requests.request("GET", f"{BASE_URL}/database/nexrad/year?year={year_input}")
+                    response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year?year={year_input}")
                 if response.status_code == 200:
                     json_data = json.loads(response.text)
                     months = json_data
@@ -65,7 +65,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                     st.warning("Please select month!")
                 else:
                     with st.spinner("Loading..."):
-                        response = requests.request("GET", f"{BASE_URL}/database/nexrad/year/month?month={month_input}&year={year_input}")
+                        response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month?month={month_input}&year={year_input}")
                     if response.status_code == 200:
                         json_data = json.loads(response.text)
                         days = json_data
@@ -77,7 +77,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                         st.warning("Please select day!")
                     else:
                         with st.spinner("Loading..."):
-                            response = requests.request("GET", f"{BASE_URL}/database/nexrad/year/month/day?day={day_input}&month={month_input}&year={year_input}")
+                            response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month/day?day={day_input}&month={month_input}&year={year_input}")
                         if response.status_code == 200:
                             json_data = json.loads(response.text)
                             station_codes = json_data
@@ -89,7 +89,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                             st.warning("Please select station code!")
                         else:
                             with st.spinner("Loading..."):
-                                response = requests.request("GET", f"{BASE_URL}/s3/nexrad?year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
+                                response = requests.get(f"{BASE_URL}/aws-s3/nexrad?year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
                             if response.status_code == 200:
                                 json_data = json.loads(response.text)
                                 files_available_in_station_code = json_data
@@ -99,7 +99,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                             file_input = st.selectbox("Select a file: ", files_available_in_station_code, key='selected_file')
                             if st.button('Fetch file ©️'):
                                 with st.spinner("Loading..."):
-                                    response = requests.request("POST", f"{BASE_URL}/s3/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
+                                    response = requests.post(f"{BASE_URL}/aws-s3/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
                                 if response.status_code == 200:
                                     json_data = json.loads(response.text)
                                     download_url = json_data
@@ -114,7 +114,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
             file_name = st.text_input('NOAA NexRad Filename',)
             if st.button('Fetch file ©️'):
                 with st.spinner("Loading..."):
-                    response = requests.request("POST", f"{BASE_URL}/fetchfile/nexrad?file_name={file_name}")
+                    response = requests.post(f"{BASE_URL}/aws-s3-fetchfile/nexrad?file_name={file_name}")
                 if response.status_code == 404:
                     st.warning("No such file exists at NEXRAD location")
                 elif response.status_code == 400:

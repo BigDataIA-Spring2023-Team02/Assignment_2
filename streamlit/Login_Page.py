@@ -49,7 +49,7 @@ def login():
         headers = {
             "Authorization": f"Bearer {st.experimental_get_query_params()['access_token'][0]}"
         }
-        url = "http://localhost:8000/users/me"
+        url = "http://localhost:8000/users/{id}"
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
@@ -76,7 +76,7 @@ def login():
                 'username': st.session_state.username,
                 'password': st.session_state.password
             }
-            res = requests.post(url='http://localhost:8000/users/me', json=user_log)
+            res = requests.post(url='http://localhost:8000/login', json=user_log)
             if res and res.status_code == 200:
                 st.success("Logged in successfully as {}".format(username))
                 st.session_state.access_token = res.json()['access_token']

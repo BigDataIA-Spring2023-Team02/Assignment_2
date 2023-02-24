@@ -37,7 +37,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
     
     with st.spinner('Refreshing map locations ...'):
         
-        response = requests.request("GET", f"{BASE_URL}/database/mapdata")#, headers=headers)
+        response = requests.get(f"{BASE_URL}/noaa-database/mapdata")#, headers=headers)
         if response.status_code == 404:
             st.warning("Unable to fetch mapdata")
             st.stop()

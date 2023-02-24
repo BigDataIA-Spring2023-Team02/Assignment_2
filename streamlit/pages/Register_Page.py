@@ -44,7 +44,7 @@ if register_submit:
         'username': st.session_state.username,
         'password': st.session_state.password
     }
-    res = requests.post(url='http://localhost:8000/user/register', data=json.dumps(register_user))
+    res = requests.post(url='http://localhost:8000/users', data=json.dumps(register_user))
     if res and res.status_code == 200:
         st.session_state.access_token = res.json()['access_token']
         st.session_state.register_disabled = True

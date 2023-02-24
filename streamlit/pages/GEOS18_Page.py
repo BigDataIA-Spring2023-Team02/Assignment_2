@@ -40,7 +40,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
     elif option == 'Search By Field 🔎':
         with st.spinner('Wait for it...'):
             st.markdown("<h3 style='text-align: center;'>Search Through Fields 🔎</h1>", unsafe_allow_html=True)
-            response = requests.request("GET", f"{BASE_URL}/database/goes18")
+            response = requests.get(f"{BASE_URL}/noaa-database/goes18")
             if response.status_code == 200:
                 json_data = json.loads(response.text)
                 products = json_data
@@ -50,7 +50,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
             
             product_input = st.selectbox("Product name: ", products, disabled = True, key="selected_product")
             with st.spinner('Loading...'):
-                response = requests.request("GET", f"{BASE_URL}/database/goes18/prod?product={product_input}")
+                response = requests.get(f"{BASE_URL}/noaa-database/goes18/prod?product={product_input}")
             if response.status_code == 200:
                 json_data = json.loads(response.text)
                 years = json_data
@@ -62,7 +62,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                 st.warning("Please select a year!")
             else:
                 with st.spinner('Loading...'):
-                    response = requests.request("GET", f"{BASE_URL}/database/goes18/prod/year?year={year_input}&product={product_input}")
+                    response = requests.get(f"{BASE_URL}/noaa-database/goes18/prod/year?year={year_input}&product={product_input}")
                 if response.status_code == 200:
                     json_data = json.loads(response.text)
                     days = json_data
@@ -74,7 +74,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                     st.warning("Please select a day!")
                 else:
                     with st.spinner('Loading...'):
-                        response = requests.request("GET", f"{BASE_URL}/database/goes18/prod/year/day?day={day_input}&year={year_input}&product={product_input}")
+                        response = requests.get(f"{BASE_URL}/noaa-database/goes18/prod/year/day?day={day_input}&year={year_input}&product={product_input}")
                     if response.status_code == 200:
                         json_data = json.loads(response.text)
                         hours = json_data
@@ -86,7 +86,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                         st.warning("Please select an hour!")
                     else:
                         with st.spinner("Loading..."):
-                            response = requests.request("GET", f"{BASE_URL}/s3/goes18?year={year_input}&day={day_input}&hour={hour_input}&product={product_input}")
+                            response = requests.get(f"{BASE_URL}/aws-s3/goes18?year={year_input}&day={day_input}&hour={hour_input}&product={product_input}")
                         if response.status_code == 200:
                             json_data = json.loads(response.text)
                             files_available = json_data
@@ -96,7 +96,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                         file_input = st.selectbox("Select a file: ", files_available, key='selected_file')
                         if st.button('Fetch file ©️'):
                             with st.spinner("Loading..."):
-                                response = requests.request("POST", f"{BASE_URL}/s3/goes18/copyfile?file_name={file_input}&product={product_input}&year={year_input}&day={day_input}&hour={hour_input}")
+                                response = requests.post(f"{BASE_URL}/aws-s3/goes18/copyfile?file_name={file_input}&product={product_input}&year={year_input}&day={day_input}&hour={hour_input}")
                             if response.status_code == 200:
                                 json_data = json.loads(response.text)
                                 download_url = json_data
@@ -111,7 +111,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
             file_name = st.text_input('NOAA GEOS-18 Filename',)
             if st.button('Fetch file ©️'):
                 with st.spinner("Loading..."):
-                    response = requests.request("POST", f"{BASE_URL}/fetchfile/goes18?file_name={file_name}")
+                    response = requests.post(f"{BASE_URL}/aws-s3-fetchfile/goes18?file_name={file_name}")
                 if response.status_code == 404:
                     st.warning("No such file exists at GOES18 location")
                 elif response.status_code == 400:
