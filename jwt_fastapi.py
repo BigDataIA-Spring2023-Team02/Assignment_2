@@ -67,7 +67,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     return verify_token(token, credentials_exception)
 
-@app.post('/user', response_model = schemas.Username)
+@app.post('/users', response_model = schemas.Username)
 def create_user(request: schemas.User, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     new_user = schemas.User_Table(first_name = request.first_name, last_name = request.last_name, 
                                     username = request.username, password = get_password_hash(request.password))
@@ -76,7 +76,7 @@ def create_user(request: schemas.User, db: Session = Depends(get_db), current_us
     db.refresh(new_user)
     return new_user
 
-@app.get('/user/{id}',response_model = schemas.Username)
+@app.get('/users/{id}',response_model = schemas.Username)
 def get_user(ID: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     user = db.query(schemas.User_Table).filter(schemas.User_Table.ID == ID).first()
     if not user:
