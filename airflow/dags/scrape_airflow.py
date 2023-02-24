@@ -113,7 +113,6 @@ def scrape_geos18_metadata():
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped GEOS18 Metadata and stored to Database file.")
-    return geos18_data
 
 def scrape_nexrad_metadata():
     nexrad_bucket_name = "noaa-nexrad-level2"
@@ -174,7 +173,6 @@ def scrape_nexrad_metadata():
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped NEXRAD Metadata and stored to Database file.")
-    return nexrad_data
 
 def scrape_nexradmap_metadata():
     nexrad_map_data_url = "https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"
@@ -250,7 +248,6 @@ def scrape_nexradmap_metadata():
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped NEXRAD Map Locations Metadata and stored to Database file.")
-    return nexradmap_data
 
 def upload_db_s3():
     s3res = boto3.resource('s3', region_name='us-east-1',

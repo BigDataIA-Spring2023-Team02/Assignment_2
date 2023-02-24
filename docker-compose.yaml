@@ -46,7 +46,7 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:latest}
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.5.1}
   # build: .
   environment:
     &airflow-common-env
@@ -74,6 +74,25 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  app:
+    env_file:
+      - .env
+    container_name: streamlit_app
+    build:
+      dockerfile: streamlit/Dockerfile
+    command: “streamlit run Login_Page.py”
+    ports:
+      - “8000:8000"
+  api:
+    env_file:
+      - .env
+    container_name: fast_api
+    build:
+      dockerfile: fast-api/Dockerfile
+    command: “uvicorn apimain:app --reload --port 8080:8080”
+    ports:
+      - “8080:8080"
+
   postgres:
     image: postgres:13
     environment:
@@ -103,7 +122,7 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - 8000:8080
+      - 8080:8080
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 10s
