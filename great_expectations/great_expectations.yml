@@ -40,32 +40,6 @@ datasources:
               - runtime_batch_identifier_name
             module_name: great_expectations.datasource.data_connector.asset
         module_name: great_expectations.datasource.data_connector
-  nexrad_data:
-    execution_engine:
-      class_name: PandasExecutionEngine
-      module_name: great_expectations.execution_engine
-    class_name: Datasource
-    module_name: great_expectations.datasource
-    data_connectors:
-      default_inferred_data_connector_name:
-        class_name: InferredAssetFilesystemDataConnector
-        name: default_inferred_data_connector_name
-        base_directory: data
-        default_regex:
-          group_names:
-            - data_asset_name
-          pattern: (.*)/.csv
-        module_name: great_expectations.datasource.data_connector
-      default_runtime_data_connector_name:
-        class_name: RuntimeDataConnector
-        name: default_runtime_data_connector_name
-        assets:
-          my_runtime_asset_name:
-            class_name: Asset
-            batch_identifiers:
-              - runtime_batch_identifier_name
-            module_name: great_expectations.datasource.data_connector.asset
-        module_name: great_expectations.datasource.data_connector
   nexrad_datasource:
     execution_engine:
       class_name: PandasExecutionEngine
@@ -104,6 +78,16 @@ stores:
 # Three stores are required: expectations, validations, and
 # evaluation_parameters, and must exist with a valid store entry. Additional
 # stores can be configured for uses such as data_docs, etc.
+  expectations_S3_store:
+    class_name: ExpectationsStore
+    store_backend:
+      class_name: TupleS3StoreBackend
+      bucket: 'damg-7245-projects'
+      prefix: 'Great_Expectations/'
+      boto3_options:
+        endpoint_url: 'AIDAWHDQQCUBOAXC3645R'
+        region_name: 'ca-central-1'
+
   expectations_store:
     class_name: ExpectationsStore
     store_backend:
@@ -116,6 +100,16 @@ stores:
       class_name: TupleFilesystemStoreBackend
       base_directory: uncommitted/validations/
 
+  validations_S3_store:
+    class_name: ValidationsStore
+    store_backend:
+      class_name: TupleS3StoreBackend
+      bucket: 'damg-7245-projects'
+      prefix: 'Great_Expectations/'
+      boto3_options:
+        endpoint_url: 'AIDAWHDQQCUBOAXC3645R'
+        region_name: 'ca-central-1'
+    
   evaluation_parameter_store:
     class_name: EvaluationParameterStore
   checkpoint_store:
@@ -132,8 +126,8 @@ stores:
       suppress_store_backend_id: true
       base_directory: profilers/
 
-expectations_store_name: expectations_store
-validations_store_name: validations_store
+expectations_store_name: expectations_S3_store
+validations_store_name: validations_S3_store
 evaluation_parameter_store_name: evaluation_parameter_store
 checkpoint_store_name: checkpoint_store
 
@@ -150,6 +144,18 @@ data_docs_sites:
       base_directory: uncommitted/data_docs/local_site/
     site_index_builder:
       class_name: DefaultSiteIndexBuilder
+  s3_site:
+    class_name: SiteBuilder
+    store_backend:
+      class_name: TupleS3StoreBackend
+      bucket: 'damg-7245-projects'
+      prefix: 'Great_Expectations/'
+      boto3_options:
+        endpoint_url: 'AIDAWHDQQCUBOAXC3645R'
+        region_name: 'ca-central-1'
+    site_index_builder:
+      class_name: DefaultSiteIndexBuilder
+      show_cta_footer: true
 
 anonymous_usage_statistics:
   data_context_id: 3f379640-f257-4da9-a6b6-c8eb6ac08c8e

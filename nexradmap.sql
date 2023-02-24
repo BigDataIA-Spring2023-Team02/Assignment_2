@@ -1,1 +1,0 @@
-CREATE TABLE IF NOT EXISTS NexradMap (ID number, Station_Code text, State text, County text, latitude float, longitude float, elevation number);
