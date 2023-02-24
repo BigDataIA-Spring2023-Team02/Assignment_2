@@ -1,0 +1,31 @@
+version: '1.3'
+
+services:
+  fastapi_app:
+    platform: linux/amd64
+    image: 'doshimee11/fastapi_assgn2:latest'
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      AWS_ACCESS_KEY: 'XXXXXX'
+      AWS_SECRET_KEY: 'XXXXXX'
+      AWS_LOG_ACCESS_KEY: 'XXXXXX'
+      AWS_LOG_SECRET_KEY: 'XXXXXX'
+      USER_BUCKET_NAME: 'XXXXXX'
+      CI_FLAG: 'False'
+    restart: always
+  
+  streamlit_app:
+    platform: linux/amd64
+    image: 'doshimee11/streamlit_assgn2:latest'
+    build: .
+    ports:
+      - 8051:8051
+    environment:
+      AWS_ACCESS_KEY: 'XXXXXX'
+      AWS_SECRET_KEY: 'XXXXXX'
+      AWS_LOG_ACCESS_KEY: 'XXXXXX'
+      AWS_LOG_SECRET_KEY: 'XXXXXX'
+      USER_BUCKET_NAME: 'XXXXXX'
+    restart: always
