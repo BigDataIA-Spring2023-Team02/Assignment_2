@@ -110,7 +110,7 @@ async def copy_goes_file_to_user_bucket(file_name : str, product : str, year : s
             status_code=status.HTTP_404_NOT_FOUND, detail= "Unable to copy file")
 
 @router.post('/nexrad/copyfile', status_code=status.HTTP_200_OK)
-def copy_nexrad_file_to_user_bucket(file_name : str, year : str, month : str, day : str, ground_station : str):
+def copy_nexrad_file_to_user_bucket(file_name : str, year : str, month : str, day : str, nexrad_station : str):
     nexrad_bucket_name = "noaa-nexrad-level2"
     s3client = boto3.client('s3',
                             region_name = 'us-east-1',
@@ -129,7 +129,7 @@ def copy_nexrad_file_to_user_bucket(file_name : str, year : str, month : str, da
                         )
     try:
         destination_bucket = s3resource.Bucket(os.environ.get('USER_BUCKET_NAME'))
-        all_selections_string = year+'/'+month+'/'+day+'/'+ground_station+'/'+file_name
+        all_selections_string = year+'/'+month+'/'+day+'/'+nexrad_station+'/'+file_name
         destination_folder = 'NEXRAD/'
         destination_key = destination_folder + file_name
         url_to_mys3 = 'https://damg-7245-projects.s3.amazonaws.com/' + destination_key

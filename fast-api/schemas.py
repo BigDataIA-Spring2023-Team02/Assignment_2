@@ -1,21 +1,21 @@
 from typing import Optional
 from pydantic import BaseModel
 
-class User(BaseModel):  #class to create or access user 
+class User(BaseModel):
     full_name: str
     username : str
     password: str
 
-class ShowUser(BaseModel): #class to show only the name of the user as a response
+class ShowUser(BaseModel):
     username: str
     class Config():
-        orm_mode = True  #allows app to take ORM object and translate into responses
+        orm_mode = True
 
-class Login(BaseModel): #class for login
+class Login(BaseModel):
     username: str
     password : str
 
-class Token(BaseModel): #token class with access token and token type
+class Token(BaseModel):
     access_token: str
     token_type: str
 

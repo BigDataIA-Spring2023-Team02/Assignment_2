@@ -56,7 +56,7 @@ async def get_hours_in_day_goes(day : str, year : str, product : str = 'ABI-L1b-
 async def get_years_nexrad(db_conn : Connection = Depends(get_database_file)):
     query = "SELECT DISTINCT Year FROM NEXRAD"
     df_year = pd.read_sql_query(query, db_conn)
-    years = df_year['year'].tolist()
+    years = df_year['Year'].tolist()
     if (len(years)!=0):
         return years
     else:
