@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 #load env variables
 load_dotenv()
 router = APIRouter(
-    prefix="/aws-s3",
-    tags=['aws-s3']
+    prefix="/aws-s3-files",
+    tags=['aws-s3-files']
 )
 
 @router.get('/goes18', status_code=status.HTTP_200_OK)

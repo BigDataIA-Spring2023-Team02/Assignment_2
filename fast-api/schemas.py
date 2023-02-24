@@ -1,37 +1,21 @@
 from typing import Optional
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
-
-class User_Table(Base):
-    __tablename__ = "users"
-    ID = Column(Integer, primary_key= True, index=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    username = Column(String)
-    password = Column(String)
-
-class User(BaseModel):
-    first_name: str
-    last_name: str
-    username: str
+class User(BaseModel):  #class to create or access user 
+    full_name: str
+    username : str
     password: str
 
-class Username(BaseModel):
+class ShowUser(BaseModel): #class to show only the name of the user as a response
     username: str
     class Config():
-        orm_mode = True
+        orm_mode = True  #allows app to take ORM object and translate into responses
 
-class UserInDB(User):
-    password: str
-
-class Login(BaseModel):
+class Login(BaseModel): #class for login
     username: str
     password : str
 
-class Token(BaseModel):
+class Token(BaseModel): #token class with access token and token type
     access_token: str
     token_type: str
 

@@ -1,6 +1,6 @@
+import re
 import os
 import boto3
-import re
 import requests
 from fastapi import APIRouter, status, HTTPException
 from dotenv import load_dotenv

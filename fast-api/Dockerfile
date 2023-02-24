@@ -4,11 +4,11 @@ RUN pip install --upgrade pip
 
 WORKDIR /app
 
-COPY apimain.py ../requirements.txt ../user_data.db /app/
+COPY . /app
 
 RUN pip install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 8000
 
-CMD ["uvicorn", "apimain:app", "--reload", "--port", "8080:8080"]
+CMD ["gunicorn" ,"-w", "4", "-k", "uvicorn.workers.UvicornWorker" , "--bind", "0.0.0.0:8000", "main:app"]
 # CMD ["gunicorn" ,"-w", "4", "-k", "uvicorn.workers.UvicornWorker" , "--bind", "0.0.0.0:8000", "apimain:app"]
