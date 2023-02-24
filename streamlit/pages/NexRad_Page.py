@@ -6,30 +6,21 @@ from PIL import Image
 if 'username' not in st.session_state:
     st.session_state.username = ''
 
-if 'logout_disabled' not in st.session_state:
-    st.session_state.logout_disabled = True
-
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
 with st.sidebar:
     user = "Not Logged In" if st.session_state.username == "" else st.session_state.username
     st.write(f'Current User: {user}')
-    logout_button = st.button('LogOut', disabled=st.session_state.logout_disabled)
+    logout_button = st.button('Log Out')
     if logout_button:
-        for key in st.session_state.keys():
-            if key == 'login_disabled' or key == 'logout_disabled' or key == 'register_disabled':
-                st.session_state[key] = not st.session_state[key]
-            else:
-                st.session_state[key] = ''
-        st.session_state.login_disabled = False
-        st.session_state.register_disabled = False
+        st.session_state['logged_in'] = False
         st.experimental_rerun()
 
-if not st.session_state.username == "" and "access_token" in st.experimental_get_query_params():
+if st.session_state['logged_in'] == True:
     st.markdown("<h2 style='text-align: center;'>Data Exploration of the GEOS dataset 🌎</h1>", unsafe_allow_html=True)
     st.header("")
-    st.image(Image.open('../Images/SatelliteImage.jpeg'))
+    st.image(Image.open('/Users/meetdoshi/Documents/Northeastern University/SPRING 2023/Big Data Systems & Intelligent Analytics/Assignment_2/Images/SatelliteImage.jpeg'))
     
     BASE_URL = "http://localhost:8000"
     option = st.selectbox('Select the option to search file', ('Select Search Type', 'Search By Field 🔎', 'Search By Filename 🔎'))
@@ -89,7 +80,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                             st.warning("Please select station code!")
                         else:
                             with st.spinner("Loading..."):
-                                response = requests.get(f"{BASE_URL}/aws-s3/nexrad?year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
+                                response = requests.get(f"{BASE_URL}/aws-s3-files/nexrad?year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}")
                             if response.status_code == 200:
                                 json_data = json.loads(response.text)
                                 files_available_in_station_code = json_data
@@ -99,7 +90,7 @@ if not st.session_state.username == "" and "access_token" in st.experimental_get
                             file_input = st.selectbox("Select a file: ", files_available_in_station_code, key='selected_file')
                             if st.button('Fetch file ©️'):
                                 with st.spinner("Loading..."):
-                                    response = requests.post(f"{BASE_URL}/aws-s3/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&ground_station={station_code_input}")
+                                    response = requests.post(f"{BASE_URL}/aws-s3-files/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}")
                                 if response.status_code == 200:
                                     json_data = json.loads(response.text)
                                     download_url = json_data
