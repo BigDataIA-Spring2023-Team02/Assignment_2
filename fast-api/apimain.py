@@ -1,6 +1,8 @@
+from noaa_database import noaa_database
+from aws_s3_files import aws_s3_files
+from s3_fetch_file import s3_fetch_file
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from router import noaa_database, aws_s3_files, s3_fetch_file
 
 load_dotenv()
 
