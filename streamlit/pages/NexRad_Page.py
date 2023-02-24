@@ -20,7 +20,7 @@ with st.sidebar:
 if st.session_state['logged_in'] == True:
     st.markdown("<h2 style='text-align: center;'>Data Exploration of the GEOS dataset 🌎</h1>", unsafe_allow_html=True)
     st.header("")
-    st.image(Image.open('streamlit/pages/SatelliteImage.jpeg'))
+    st.image(Image.open('../streamlit/pages/SatelliteImage.jpeg'))
     
     BASE_URL = "http://localhost:8000"
     option = st.selectbox('Select the option to search file', ('Select Search Type', 'Search By Field 🔎', 'Search By Filename 🔎'))
@@ -31,7 +31,7 @@ if st.session_state['logged_in'] == True:
     elif option == 'Search By Field 🔎':
         with st.spinner('Wait for it...'):
             st.markdown("<h3 style='text-align: center;'>Search Through Fields 🔎</h1>", unsafe_allow_html=True)
-            response = requests.get(f"{BASE_URL}/noaa-database/nexrad")
+            response = requests.get(f"{BASE_URL}/noaa-database/nexrad", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
             if response.status_code == 200:
                 json_data = json.loads(response.text)
                 years = json_data
@@ -44,7 +44,7 @@ if st.session_state['logged_in'] == True:
                 st.warning("Please select a year!")
             else:
                 with st.spinner("Loading..."):
-                    response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year?year={year_input}")
+                    response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year?year={year_input}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                 if response.status_code == 200:
                     json_data = json.loads(response.text)
                     months = json_data
@@ -56,7 +56,7 @@ if st.session_state['logged_in'] == True:
                     st.warning("Please select month!")
                 else:
                     with st.spinner("Loading..."):
-                        response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month?month={month_input}&year={year_input}")
+                        response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month?month={month_input}&year={year_input}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                     if response.status_code == 200:
                         json_data = json.loads(response.text)
                         days = json_data
@@ -68,7 +68,7 @@ if st.session_state['logged_in'] == True:
                         st.warning("Please select day!")
                     else:
                         with st.spinner("Loading..."):
-                            response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month/day?day={day_input}&month={month_input}&year={year_input}")
+                            response = requests.get(f"{BASE_URL}/noaa-database/nexrad/year/month/day?day={day_input}&month={month_input}&year={year_input}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                         if response.status_code == 200:
                             json_data = json.loads(response.text)
                             station_codes = json_data
@@ -80,7 +80,7 @@ if st.session_state['logged_in'] == True:
                             st.warning("Please select station code!")
                         else:
                             with st.spinner("Loading..."):
-                                response = requests.get(f"{BASE_URL}/aws-s3-files/nexrad?year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}")
+                                response = requests.get(f"{BASE_URL}/aws-s3-files/nexrad?year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                             if response.status_code == 200:
                                 json_data = json.loads(response.text)
                                 files_available_in_station_code = json_data
@@ -90,7 +90,7 @@ if st.session_state['logged_in'] == True:
                             file_input = st.selectbox("Select a file: ", files_available_in_station_code, key='selected_file')
                             if st.button('Fetch file ©️'):
                                 with st.spinner("Loading..."):
-                                    response = requests.post(f"{BASE_URL}/aws-s3-files/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}")
+                                    response = requests.post(f"{BASE_URL}/aws-s3-files/nexrad/copyfile?file_name={file_input}&year={year_input}&month={month_input}&day={day_input}&nexrad_station={station_code_input}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                                 if response.status_code == 200:
                                     json_data = json.loads(response.text)
                                     download_url = json_data
@@ -105,7 +105,7 @@ if st.session_state['logged_in'] == True:
             file_name = st.text_input('NOAA NexRad Filename',)
             if st.button('Fetch file ©️'):
                 with st.spinner("Loading..."):
-                    response = requests.post(f"{BASE_URL}/aws-s3-fetchfile/nexrad?file_name={file_name}")
+                    response = requests.post(f"{BASE_URL}/aws-s3-fetchfile/nexrad?file_name={file_name}", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
                 if response.status_code == 404:
                     st.warning("No such file exists at NEXRAD location")
                 elif response.status_code == 400:

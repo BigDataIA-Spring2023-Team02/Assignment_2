@@ -28,7 +28,7 @@ if st.session_state['logged_in'] == True:
     
     with st.spinner('Refreshing map locations ...'):
         
-        response = requests.get(f"{BASE_URL}/noaa-database/mapdata")#, headers=headers)
+        response = requests.get(f"{BASE_URL}/noaa-database/mapdata", headers={'Authorization' : f"Bearer {st.session_state['access_token']}"})
         if response.status_code == 404:
             st.warning("Unable to fetch mapdata")
             st.stop()
@@ -37,11 +37,11 @@ if st.session_state['logged_in'] == True:
             map_dict = json_data
 
         map = folium.Map(location=[40,-100], tiles="OpenStreetMap", zoom_start=4)
-        for i in range(0,len(map_dict)):
-            folium.Marker(
-            location = [map_dict['latitude'][i], map_dict['longitude'][i]],
-            popup = (map_dict['Station_Code'][i],map_dict['County'][i])
-            ).add_to(map)
+        for i in range(len(map_dict["Station_Code"])):
+            tooltip_text = f"Station Code: {map_dict['Station_Code'][i]}, County: {map_dict['County'][i]}"
+            folium.Marker([map_dict["latitude"][i],map_dict["longitude"][i]],
+                          tooltip = tooltip_text
+                          ).add_to(map)
 
         st.markdown("<h2 style='text-align: center;'>Nexrad Station Pointers</h1>", unsafe_allow_html=True)
         stf.st_folium(map, width=700, height=460)
