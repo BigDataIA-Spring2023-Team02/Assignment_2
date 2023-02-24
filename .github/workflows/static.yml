@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: DQ Reports
 
 on:
   # Runs on pushes targeting the default branch
@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: 'Assignment_2/great_expectations/uncommitted/data_docs/local_site'
+          path: 'great_expectations/uncommitted/data_docs/local_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
