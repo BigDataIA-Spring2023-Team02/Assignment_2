@@ -95,25 +95,25 @@ def scrape_geos18_metadata():
 
     database_file_path = os.path.join(os.path.dirname(__file__), database_file_name)
     ddl_file_path = os.path.join(os.path.dirname(__file__), ddl_file_name)
+    db = sqlite3.connect(database_file_path)
 
     if Path(database_file_path).is_file():
         write_logs(f"Database file found, saving GEOS18 metadata into GEOS18 Table")
-        db = sqlite3.connect(database_file_path)
         geos18_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
-        
+    
     else:
         write_logs(f"Database file not found, initializing database {database_file_name} and updating data into GEOS18 Table.")
         with open(ddl_file_path, 'r') as sql_file:
             sql_script = sql_file.read()        
-        db = sqlite3.connect(database_file_path)
         geos18_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
         cursor.executescript(sql_script)
-        
+    
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped GEOS18 Metadata and stored to Database file.")
+    return geos18_data
 
 def scrape_nexrad_metadata():
     nexrad_bucket_name = "noaa-nexrad-level2"
@@ -156,10 +156,10 @@ def scrape_nexrad_metadata():
 
     database_file_path = os.path.join(os.path.dirname(__file__), database_file_name)
     ddl_file_path = os.path.join(os.path.dirname(__file__), ddl_file_name)
-
+    db = sqlite3.connect(database_file_path)
+    
     if Path(database_file_path).is_file():
         write_logs(f"Database file found, saving NEXRAD metadata into NEXRAD Table")
-        db = sqlite3.connect(database_file_path)
         nexrad_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
     
@@ -167,7 +167,6 @@ def scrape_nexrad_metadata():
         write_logs(f"Database file not found, initializing database {database_file_name} and updating data into NEXRAD Table.")
         with open(ddl_file_path, 'r') as sql_file:
             sql_script = sql_file.read()        
-        db = sqlite3.connect(database_file_path)
         nexrad_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
         cursor.executescript(sql_script)
@@ -175,6 +174,7 @@ def scrape_nexrad_metadata():
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped NEXRAD Metadata and stored to Database file.")
+    return nexrad_data
 
 def scrape_nexradmap_metadata():
     nexrad_map_data_url = "https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"
@@ -232,10 +232,10 @@ def scrape_nexradmap_metadata():
 
     database_file_path = os.path.join(os.path.dirname(__file__), database_file_name)
     ddl_file_path = os.path.join(os.path.dirname(__file__), ddl_file_name)
-
+    db = sqlite3.connect(database_file_path)
+    
     if Path(database_file_path).is_file():
         write_logs(f"Database file found, saving NEXRAD metadata into NEXRAD Table")
-        db = sqlite3.connect(database_file_path)
         nexradmap_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
     
@@ -243,7 +243,6 @@ def scrape_nexradmap_metadata():
         write_logs(f"Database file not found, initializing database {database_file_name} and updating data into NEXRAD Table.")
         with open(ddl_file_path, 'r') as sql_file:
             sql_script = sql_file.read()        
-        db = sqlite3.connect(database_file_path)
         nexradmap_data.to_sql(table_name, db, if_exists = 'replace', index=False)
         cursor = db.cursor()
         cursor.executescript(sql_script)
@@ -251,6 +250,22 @@ def scrape_nexradmap_metadata():
     db.commit()
     db.close()
     write_logs(f"Successfully Scraped NEXRAD Map Locations Metadata and stored to Database file.")
+    return nexradmap_data
+
+def upload_db_s3():
+    s3res = boto3.resource('s3', region_name='us-east-1',
+                        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
+                        aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
+    s3res.Bucket(os.environ.get('USER_BUCKET_NAME')).upload_file("./dags/airflow_scrape_data.db", "data-store/airflow_scrape_data.db")
+    
+    database_file_name = 'airflow_scrape_data.db'
+    database_file_path = os.path.join(os.path.dirname(__file__),database_file_name)
+    conn = sqlite3.connect(database_file_path, isolation_level=None, detect_types=sqlite3.PARSE_COLNAMES)
+    goes_df = pd.read_sql_query("SELECT * FROM GEOS18", conn)
+    nexrad_df = pd.read_sql_query("SELECT * FROM NEXRAD", conn)
+
+    s3client.put_object(Body=goes_df.to_csv(index=False), Bucket=os.environ.get('USER_BUCKET_NAME'), Key='data-store/goes18_data.csv')
+    s3client.put_object(Body=nexrad_df.to_csv(index=False), Bucket=os.environ.get('USER_BUCKET_NAME'), Key='data-store/nexrad_data.csv')
 
 with dag:
     output_file = BashOperator(
@@ -283,6 +298,13 @@ with dag:
     provide_context=True,
     dag=dag,
     )
- 
+
+    upload_db = PythonOperator(   
+    task_id='upload_db_to_s3',
+    python_callable = upload_db_s3,
+    provide_context=True,
+    dag=dag,
+    )
+
     clean_dir >> output_file
-    scrape_geos18 >> scrape_nexrad >> scrape_nexradmap
+    scrape_geos18 >> scrape_nexrad >> scrape_nexradmap >> upload_db

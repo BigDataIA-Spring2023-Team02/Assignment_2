@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './great_expectations/uncommitted/data_docs/local_site'
+          path: 'Assignment_2/great_expectations/uncommitted/data_docs/local_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
